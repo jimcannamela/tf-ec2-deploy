@@ -13,6 +13,49 @@ provider "aws" {
   region = "us-east-2"
 }
 
+resource "aws_iam_role" "ec2_role" {
+  name = "ec2_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "ec2_role_policy" {
+  name = "ec2_role_policy"
+  role = aws_iam_role.ec2_role.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:CreateBucket",
+          "s3:DeleteBucket",
+          "s3:ListAllMyBuckets"
+        ]
+        Effect = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "ec2_instance_profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+
 // Create an EC2 instance
 /*
   - Name your resources appropriately and use descriptive names
@@ -31,6 +74,8 @@ resource "aws_instance" "app_server" {
 
   key_name = "JimCAWSInstanceKey"
   
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.id
+
   tags = {
     Name = "jimc-tf-instance"
   }
@@ -67,6 +112,6 @@ resource "aws_security_group" "allowssh" {
   tags = {
     Name = "allow_ssh"
   }
-
-
 }
+
+
