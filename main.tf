@@ -21,6 +21,7 @@ provider "aws" {
   - Use the latest Amazon Linux 2 AMI for your region (hardcode the AMI ID)
   - Use the default VPC for your region
 */
+
 resource "aws_instance" "app_server" {
   ami           = "ami-0911e88fb4687e06b"
   instance_type = "t2.micro"
@@ -28,7 +29,9 @@ resource "aws_instance" "app_server" {
   vpc_security_group_ids = [aws_security_group.allowssh.id]
   associate_public_ip_address = true
 
-    tags = {
+  key_name = "JimCAWSInstanceKey"
+  
+  tags = {
     Name = "jimc-tf-instance"
   }
 
@@ -49,8 +52,21 @@ resource "aws_security_group" "allowssh" {
     description      = "SSH inbound traffic"
     from_port        = 22
     to_port          = 22
-    protocol         = "ssh"
+    protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_ssh"
+  }
+
 
 }
