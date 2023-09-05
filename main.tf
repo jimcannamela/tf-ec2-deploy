@@ -30,7 +30,9 @@ resource "aws_instance" "app_server" {
   associate_public_ip_address = true
 
   key_name = "JimCAWSInstanceKey"
-  
+
+  user_data = file("install-web-server.sh")
+
   tags = {
     Name = "jimc-tf-instance"
   }
@@ -56,6 +58,14 @@ resource "aws_security_group" "allowssh" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
 
+  ingress {
+      description = "Allow HTTP inbound traffic"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -67,6 +77,4 @@ resource "aws_security_group" "allowssh" {
   tags = {
     Name = "allow_ssh"
   }
-
-
 }
