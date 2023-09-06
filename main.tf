@@ -69,7 +69,7 @@ resource "aws_instance" "app_server" {
   ami           = "ami-0911e88fb4687e06b"
   instance_type = "t2.micro"
 
-  vpc_security_group_ids = [aws_security_group.jimc_allowssh.id]
+  security_groups = [aws_security_group.jimc_allowssh.name]
   associate_public_ip_address = true
 
   key_name = "JimCAWSInstanceKey"
