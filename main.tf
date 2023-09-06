@@ -13,8 +13,8 @@ provider "aws" {
   region = "us-east-2"
 }
 
-resource "aws_iam_role" "ec2_role" {
-  name = "ec2_role"
+resource "aws_iam_role" "jimc_ec2_role" {
+  name = "jimc_ec2_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -30,9 +30,9 @@ resource "aws_iam_role" "ec2_role" {
   })
 }
 
-resource "aws_iam_role_policy" "ec2_role_policy" {
-  name = "ec2_role_policy"
-  role = aws_iam_role.ec2_role.id
+resource "aws_iam_role_policy" "jimc_ec2_role_policy" {
+  name = "jimc_ec2_role_policy"
+  role = aws_iam_role.jimc_ec2_role.id
   
   policy = jsonencode({
     Version = "2012-10-17"
@@ -50,9 +50,9 @@ resource "aws_iam_role_policy" "ec2_role_policy" {
   })
 }
 
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "ec2_instance_profile"
-  role = aws_iam_role.ec2_role.name
+resource "aws_iam_instance_profile" "jimc_ec2_instance_profile" {
+  name = "jimc_ec2_instance_profile"
+  role = aws_iam_role.jimc_ec2_role.name
 }
 
 
@@ -69,12 +69,12 @@ resource "aws_instance" "app_server" {
   ami           = "ami-0911e88fb4687e06b"
   instance_type = "t2.micro"
 
-  vpc_security_group_ids = [aws_security_group.allowssh.id]
+  vpc_security_group_ids = [aws_security_group.jimc_allowssh.id]
   associate_public_ip_address = true
 
   key_name = "JimCAWSInstanceKey"
   
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.id
+  iam_instance_profile = aws_iam_instance_profile.jimc_ec2_instance_profile.id
 
   tags = {
     Name = "jimc-tf-instance"
@@ -88,8 +88,8 @@ resource "aws_instance" "app_server" {
   - Name your resources appropriately and use descriptive names
   - Use a Security Group that allows SSH access from anywhere
 */
-resource "aws_security_group" "allowssh" {
-  name        = "allow_ssh"
+resource "aws_security_group" "jimc_allowssh" {
+  name        = "jimc_allow_ssh"
   description = "Allow SSH inbound traffic"
   vpc_id      = "vpc-0a45b8e72c09a7c94"
 
@@ -110,7 +110,7 @@ resource "aws_security_group" "allowssh" {
   }
 
   tags = {
-    Name = "allow_ssh"
+    Name = "jimc_allow_ssh"
   }
 }
 
